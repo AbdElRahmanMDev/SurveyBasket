@@ -9,7 +9,7 @@ namespace SurveyBasket.API.Services
             {
                 Id = 1,
                 Description="First Poll added",
-                Name="Poll 1"
+                Title="Poll 1"
             }
         };
 
@@ -40,7 +40,7 @@ namespace SurveyBasket.API.Services
             if (currentpoll is null)
                 return false;
 
-            currentpoll.Name= poll.Name;
+            currentpoll.Title= poll.Title;
             currentpoll.Description= poll.Description;
 
             return true;
