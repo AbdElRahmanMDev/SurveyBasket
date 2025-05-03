@@ -1,4 +1,4 @@
-﻿namespace SurveyBasket.API.Contracts.Validations
+﻿namespace SurveyBasket.API.Contracts.Students
 {
     public class StudentValidator : AbstractValidator<Student>
     {
@@ -6,7 +6,7 @@
         {
             RuleFor(x => x.DateOfBirth)
                 .Must(BeMoreThan18Years)
-                .When(x=>x.DateOfBirth.HasValue)
+                .When(x => x.DateOfBirth.HasValue)
                 .WithMessage("{PropertyName} is Invalid , age should be 18 years At Least");
         }
 

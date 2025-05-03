@@ -1,6 +1,4 @@
 ﻿
-using SurveyBasket.API.Contracts.Requests;
-using SurveyBasket.API.Contracts.Responses;
 
 namespace SurveyBasket.API.Mapping;
 

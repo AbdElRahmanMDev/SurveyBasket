@@ -1,6 +1,6 @@
 ﻿using SurveyBasket.API.ValidationsAttributes;
 
-namespace SurveyBasket.API.Models
+namespace SurveyBasket.API.Entites
 {
     public class Student
     {
