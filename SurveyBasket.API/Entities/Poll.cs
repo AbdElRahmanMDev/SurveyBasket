@@ -1,6 +1,8 @@
-﻿namespace SurveyBasket.API.Entites
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace SurveyBasket.API.Entites
 {
-    public sealed class Poll
+    public sealed class Poll : AuditableEntity
     {
         public int Id { get; set; }
 
@@ -12,5 +14,11 @@
 
         public DateOnly StartsAt { get; set; }
         public DateOnly EndsAt { get; set; }
+
+
+        ICollection<Question> Questions = [];
+
+
+
     }
 }

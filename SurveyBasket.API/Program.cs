@@ -1,6 +1,7 @@
 using FluentValidation;
 using SurveyBasket.API;
 using SurveyBasket.API.Entities;
+using SurveyBasket.API.Middlewares;
 using SurveyBasket.API.Persistence;
 using SurveyBasket.API.Services;
 using System.Reflection;
@@ -28,10 +29,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("MyPolicy");
+
 app.UseAuthorization();
 
 //app.MapIdentityApi<ApplicationUser>();
 
 app.MapControllers();
+
+app.UseExceptionHandler();
 
 app.Run();

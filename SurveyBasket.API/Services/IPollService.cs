@@ -4,14 +4,15 @@
     {
       Task<IEnumerable<Poll>> GetAllPollsAsync(CancellationToken cancellationToken = default);
 
-        Task<Poll?> GetpollByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<TResult<PollResponse>> GetpollByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<Poll> AddAsync(Poll poll, CancellationToken cancellationToken = default);
+        Task<TResult<PollResponse>> AddAsync(PollRequest request, CancellationToken cancellationToken = default);
 
-        Task<bool> UpdateAysnc(int id, Poll poll, CancellationToken cancellationToken = default);
+        Task<Result> UpdateAysnc(int id, Poll poll, CancellationToken cancellationToken = default);
 
-        Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+        Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<bool> ToggleStatusAsync(int id, CancellationToken cancellationToken = default);
+        Task<Result> ToggleStatusAsync(int id, CancellationToken cancellationToken = default);
+
     }
 }

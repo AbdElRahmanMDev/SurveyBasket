@@ -13,3 +13,5 @@ global using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using  SurveyBasket.API.Entities;
+global using SurveyBasket.API.Abstraction;
+global using SurveyBasket.API.Errors;
