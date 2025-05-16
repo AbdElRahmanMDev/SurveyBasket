@@ -11,10 +11,10 @@
 - **JWT Authentication & Refresh Tokens**
 - **Swagger / OpenAPI**
 - **SQL Server / PostgreSQL**
-- **AutoMapper**
+- **Mapster**
 - **Hangfire** (for background jobs)
 - **Serilog** (for logging)
-- **Redis** (for caching)
+
 
 ---
 
