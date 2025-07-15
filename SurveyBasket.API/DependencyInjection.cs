@@ -65,6 +65,9 @@ namespace SurveyBasket.API
 
             Service.AddScoped<IQuestionService, QuestionService>();
 
+            Service.AddScoped<IVoteService, VoteService>();
+
+            Service.AddScoped<IResultService, ResultService>(); 
 
             Service.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>(); // Registers ASP.NET Core Identity services with EF Core store

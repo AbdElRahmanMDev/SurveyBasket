@@ -13,6 +13,8 @@ public sealed class Question : AuditableEntity
     public bool IsActive { get; set; } = true;
 
     public ICollection<Answer> answers { get; set; } = [];
+    public ICollection<VoteAnswers> voteAnswers { get; set; } = [];
+
 
     
 }

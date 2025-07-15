@@ -16,8 +16,9 @@ namespace SurveyBasket.API.Entites
         public DateOnly EndsAt { get; set; }
 
 
-        ICollection<Question> Questions = [];
+        public ICollection<Question> Questions { get; set; } = [];
 
+        public ICollection<Vote> Votes { get; set; } = [];
 
 
     }

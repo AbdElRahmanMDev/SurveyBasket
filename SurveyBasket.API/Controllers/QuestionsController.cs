@@ -17,33 +17,29 @@ namespace SurveyBasket.API.Controllers
             _questionService = questionService;
         }
 
-        
+        [HttpGet("JustGet")]
         public IActionResult Get()
         {
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPost("AddQuestion")]
 
         public async Task<IActionResult> Add([FromRoute]int PollId,QuestionRequest request,CancellationToken cancellationToken)
         {
 
             var result = await _questionService.AddAsync(PollId, request,cancellationToken);
 
-            if (result.IsSuccess)
-                return CreatedAtAction(nameof(Get), new { PollId, result.Value.Id }, result.Value);
+            return result.IsSuccess ? CreatedAtAction(nameof(Get), new { PollId, result.Value.Id }, result.Value) : result.ToProblem();
 
-            return result.Error.Equals(QuestionErrors.QuestionAlreadyExist) ?
-                result.ToProblem(StatusCodes.Status409Conflict) :
-                result.ToProblem(StatusCodes.Status404NotFound);
         }
 
-        [HttpGet]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromRoute]int PollId)
         {
             var result = await _questionService.GetAll(PollId);
 
-            return result.IsSuccess ? Ok(result.Value) : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
         [HttpGet("{id}")]
@@ -51,7 +47,7 @@ namespace SurveyBasket.API.Controllers
         {
             var result = await _questionService.GetById(id, PollId, cancellationToken);
 
-            return result.IsSuccess ? Ok(result.Value) : result.ToProblem(StatusCodes.Status404NotFound);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
     }

@@ -18,6 +18,10 @@ public class ApplicationDbContext :IdentityDbContext<ApplicationUser>
     public DbSet<Answer> Answers { get; set; }
     public DbSet<Question> Questions { get; set; }
 
+    public DbSet<Vote> Votes { get; set; }  
+
+    public DbSet<VoteAnswers> VoteAnswers { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

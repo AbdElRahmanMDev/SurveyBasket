@@ -2,9 +2,9 @@
 
 public class QuestionErrors
 {
-    public static readonly Error QuestionAlreadyExist =
-                    new Error("Question.AlreadyExist", "Duplicate question is Not Allowed");
-
     public static readonly Error QuestionNotFound =
-                new Error("Question.NotFound", "question is Not Found");
+       new("Question.NotFound", "No question was found with the given ID", StatusCodes.Status404NotFound);
+
+    public static readonly Error DuplicatedQuestionContent =
+        new("Question.DuplicatedContent", "Another question with the same content is already exists", StatusCodes.Status409Conflict);
 }

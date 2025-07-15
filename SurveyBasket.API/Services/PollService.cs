@@ -16,9 +16,13 @@ namespace SurveyBasket.API.Services
 
        
 
-        public async Task<IEnumerable<Poll>> GetAllPollsAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<PollResponse>> GetAllPollsAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.Polls.AsNoTracking().ToListAsync(cancellationToken);
+            var poll= await _context.Polls
+                .ProjectToType<PollResponse>() 
+                .AsNoTracking().ToListAsync(cancellationToken);
+
+            return poll;
         }
 
 
@@ -70,7 +74,7 @@ namespace SurveyBasket.API.Services
 
           var Exist=await _context.Polls.AnyAsync(x => x.Title == request.Title);
             if (Exist)
-                return Result.Failure<PollResponse>(PollErrors.PollAlreadyExist);
+                return Result.Failure<PollResponse>(PollErrors.DuplicatedPollTitle);
             var poll = request.Adapt<Poll>();
 
 
@@ -93,6 +97,14 @@ namespace SurveyBasket.API.Services
             return Result.Succes();
         }
 
-        
+        public async Task<IEnumerable<PollResponse>> GetCurrentAsync(CancellationToken cancellationToken = default)
+        {
+            var polls = await _context.Polls.
+                Where(x => x.IsPublished && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) && DateOnly.FromDateTime(DateTime.UtcNow) <= x.EndsAt)
+                .ProjectToType<PollResponse>()
+                .AsNoTracking().ToListAsync(cancellationToken); 
+
+            return polls;
+        }
     }
 }

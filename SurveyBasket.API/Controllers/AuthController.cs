@@ -33,7 +33,7 @@ namespace SurveyBasket.API.Controllers
 
             var result = await _authService.GetTokenAsync(request.email, request.password,cancellationToken);
 
-            return result.IsSuccess ? Ok(result.Value) : result.ToProblem(StatusCodes.Status400BadRequest);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
         [HttpPost("refresh")]
@@ -41,7 +41,7 @@ namespace SurveyBasket.API.Controllers
         {
           var authResult= await _authService.GenerateNewTokenAndRefreshToken(request.token,request.refreshToken,token);
 
-            return authResult.IsSuccess ? Ok(authResult) : authResult.ToProblem(StatusCodes.Status400BadRequest);
+            return authResult.IsSuccess ? Ok(authResult) : authResult.ToProblem();
         }
 
         [HttpPost("revoke-refresh-token")]
@@ -49,7 +49,7 @@ namespace SurveyBasket.API.Controllers
         {
             var isRevoked = await _authService.Revoked(request.token, request.refreshToken, token);
 
-            return isRevoked.IsSuccess ? Ok() : isRevoked.ToProblem(StatusCodes.Status400BadRequest);
+            return isRevoked.IsSuccess ? Ok() : isRevoked.ToProblem();
         
         }
 

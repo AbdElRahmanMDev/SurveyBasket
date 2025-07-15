@@ -1,13 +1,11 @@
-﻿
-
-namespace SurveyBasket.API.Errors
+﻿namespace SurveyBasket.API.Errors
 {
     public class PollErrors
     {
         public static readonly Error PollNotFound =
-                            new Error("Poll.NotFound", "No poll was found with the given ID");
+       new("Poll.NotFound", "No poll was found with the given ID", StatusCodes.Status404NotFound);
 
-        public static readonly Error PollAlreadyExist =
-                         new Error("Poll.AlreadyExist", "Duplicate Poll is Not Allowed");
+        public static readonly Error DuplicatedPollTitle =
+            new("Poll.DuplicatedTitle", "Another poll with the same title is already exists", StatusCodes.Status409Conflict);
     }
 }
