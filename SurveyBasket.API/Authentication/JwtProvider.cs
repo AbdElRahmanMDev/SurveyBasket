@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.Configuration.UserSecrets;
+﻿using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.API.Authentication;

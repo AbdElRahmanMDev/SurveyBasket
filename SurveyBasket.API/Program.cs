@@ -1,4 +1,5 @@
 using FluentValidation;
+using Serilog;
 using SurveyBasket.API;
 using SurveyBasket.API.Entities;
 using SurveyBasket.API.Middlewares;
@@ -17,6 +18,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddService(builder,builder.Configuration);
 
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);    
+});
 
 var app = builder.Build();
 
@@ -26,6 +31,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 

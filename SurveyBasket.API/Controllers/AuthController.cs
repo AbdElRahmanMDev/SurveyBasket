@@ -19,17 +19,20 @@ namespace SurveyBasket.API.Controllers
         private readonly IConfiguration _configuration;
         private readonly JwtOptions _options;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<AuthController> _logger;   
 
-        public AuthController(IAuthService authService,IConfiguration configuration,IOptions<JwtOptions> options,UserManager<ApplicationUser> userManager)
+        public AuthController(IAuthService authService,IConfiguration configuration,IOptions<JwtOptions> options,UserManager<ApplicationUser> userManager, ILogger<AuthController> logger)
         {
             _authService = authService;
             _configuration = configuration;
             _options = options.Value;
             _userManager = userManager;
+            _logger = logger;
         }
         [HttpPost("")]
         public async Task<IActionResult> GenreateToken(AuthRequest request,CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Logging with email: {email} and password {passwrod}",request.email,request.password);
 
             var result = await _authService.GetTokenAsync(request.email, request.password,cancellationToken);
 
