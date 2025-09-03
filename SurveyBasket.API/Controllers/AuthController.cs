@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Options;
 using SurveyBasket.API.Abstraction;
 using SurveyBasket.API.Authentication;
@@ -20,6 +21,7 @@ namespace SurveyBasket.API.Controllers
         private readonly JwtOptions _options;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AuthController> _logger;   
+        
 
         public AuthController(IAuthService authService,IConfiguration configuration,IOptions<JwtOptions> options,UserManager<ApplicationUser> userManager, ILogger<AuthController> logger)
         {
@@ -56,24 +58,35 @@ namespace SurveyBasket.API.Controllers
         
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> CreateUser(AuthRequest model)
+      
+
+
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
         {
-            var user = new ApplicationUser()
-            {
-                Email = model.email,
-                UserName= model.email
+            var result = await _authService.RegisterAsync(request, cancellationToken);
+            return result.IsSuccess ? Ok() : result.ToProblem();
+        }
 
-            };
+        [HttpPost("ConfirmEmail")]
 
-            var result = await _userManager.CreateAsync(user, model.password);
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request,CancellationToken cancellationToken)
+        {
+            var result=await _authService.ConfirmCode(request,cancellationToken);
 
-            if(result.Succeeded)
-            {
-                return Ok(new { message = "User registered successfuly" });
+            return result.IsSuccess ? Ok() : result.ToProblem();
 
-            }
-            return BadRequest(result.Errors);
+        }
+
+
+        [HttpPost("ResendConfirmEmail")]
+
+        public async Task<IActionResult> ResendConfirmEmail([FromBody] ResendConfirmationEmail request, CancellationToken cancellationToken)
+        {
+            var result = await _authService.ResendConfirmCode(request, cancellationToken);
+
+            return result.IsSuccess ? Ok() : result.ToProblem();
+
         }
     }
 }

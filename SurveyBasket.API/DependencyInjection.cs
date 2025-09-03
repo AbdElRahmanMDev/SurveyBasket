@@ -1,6 +1,7 @@
 ﻿using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.API.Authentication;
@@ -70,11 +71,15 @@ namespace SurveyBasket.API
             Service.AddScoped<IResultService, ResultService>(); 
 
             Service.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>(); // Registers ASP.NET Core Identity services with EF Core store
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders(); // Registers ASP.NET Core Identity services with EF Core store
 
 
+            Service.Configure<MailOptions>(builder.Configuration.GetSection("MailSettings"));
 
             Service.AddExceptionHandler<GlobalException>();
+
+            Service.AddScoped<IEmailSender,EmailService>();
 
             Service.AddProblemDetails();
 
@@ -103,6 +108,13 @@ namespace SurveyBasket.API
                     ValidAudience = configuration["Jwt:Audience"],
                 };
             }); // Registers JWT Bearer authentication scheme and token validation parameters
+
+
+            Service.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 5;
+                options.User.RequireUniqueEmail = true;
+            });
 
             return Service;
 
