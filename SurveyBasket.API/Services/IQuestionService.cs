@@ -11,5 +11,8 @@ namespace SurveyBasket.API.Services
 
         Task<TResult<QuestionResponse>> GetById(int id, int pollId, CancellationToken cancellationToken = default);
 
+        Task<Result> UpdateAsync(int pollId, int id, QuestionRequest request, CancellationToken cancellationToken = default);
+        Task<Result> ToggleStatusAsync(int pollId, int id, CancellationToken cancellationToken = default);
+
     }
 }

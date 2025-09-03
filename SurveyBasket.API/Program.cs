@@ -18,6 +18,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddService(builder,builder.Configuration);
 
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddScoped<ICacheService, CacheService>();
+
 builder.Host.UseSerilog((context, configuration) =>
 {
     configuration.ReadFrom.Configuration(context.Configuration);    
