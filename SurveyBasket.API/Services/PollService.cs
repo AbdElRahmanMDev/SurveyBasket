@@ -1,4 +1,5 @@
 ﻿
+using Hangfire;
 using SurveyBasket.API.Abstraction;
 using SurveyBasket.API.Persistence;
 using System.Runtime.ExceptionServices;
@@ -8,10 +9,11 @@ namespace SurveyBasket.API.Services
     public class PollService : IPollService
     {
         private readonly ApplicationDbContext _context;
-
-        public PollService(ApplicationDbContext context)
+        private readonly INotificationService _notificationService;
+        public PollService(ApplicationDbContext context,INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
        
@@ -93,6 +95,9 @@ namespace SurveyBasket.API.Services
 
             poll.IsPublished = !poll.IsPublished;
             await _context.SaveChangesAsync(cancellationToken);
+
+            if(poll.IsPublished && poll.StartsAt == DateOnly.FromDateTime(DateTime.UtcNow))
+                BackgroundJob.Enqueue(() => _notificationService.SendNewPollNotification(poll.Id));
 
             return Result.Succes();
         }
