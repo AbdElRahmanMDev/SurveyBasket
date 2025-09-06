@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using Hangfire;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -61,6 +62,7 @@ namespace SurveyBasket.API
 
             Service.AddScoped<IAuthService, AuthService>(); // Registers AuthService with scoped lifetime for dependency injection
 
+            Service.AddScoped<INotificationService, NotificationService>();
 
             Service.AddSingleton<IJwtProvider, JwtProvider>(); // Registers JwtProvider with singleton lifetime for JWT token creation
 
@@ -79,7 +81,7 @@ namespace SurveyBasket.API
 
             Service.AddExceptionHandler<GlobalException>();
 
-            Service.AddScoped<IEmailSender,EmailService>();
+            Service.AddScoped<IEmailSender,EmailSender>();
 
             Service.AddProblemDetails();
 
@@ -116,7 +118,17 @@ namespace SurveyBasket.API
                 options.User.RequireUniqueEmail = true;
             });
 
+
+            Service.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+
+            Service.AddHangfireServer();
             return Service;
+
+
 
         }
 

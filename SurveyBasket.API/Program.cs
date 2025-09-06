@@ -1,5 +1,6 @@
 
 using FluentValidation;
+using Hangfire;
 using Serilog;
 using SurveyBasket.API;
 using SurveyBasket.API.Entities;
@@ -40,6 +41,14 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
+
+app.UseHangfireDashboard("/jobs");
+
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using var scope = scopeFactory.CreateScope();
+var notificatinService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+
+RecurringJob.AddOrUpdate("sendNewPollNotification",() => notificatinService.SendNewPollNotification(null), Cron.Daily);
 
 app.UseCors("MyPolicy");
 

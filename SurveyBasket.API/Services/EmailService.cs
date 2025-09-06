@@ -8,11 +8,11 @@ using SurveyBasket.API.Authentication;
 
 namespace SurveyBasket.API.Services
 {
-    public class EmailService : IEmailSender
+    public class EmailSender : IEmailSender
     {
         private readonly MailOptions _mailSettings;
-        private readonly ILogger<EmailService> _logger;
-        public EmailService(IOptions<MailOptions> sender, ILogger<EmailService> logger)
+        private readonly ILogger<EmailSender> _logger;
+        public EmailSender(IOptions<MailOptions> sender, ILogger<EmailSender> logger)
         {
             _mailSettings = sender.Value;
             _logger = logger;
