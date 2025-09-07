@@ -70,6 +70,8 @@ namespace SurveyBasket.API
 
             Service.AddScoped<IVoteService, VoteService>();
 
+            Service.AddScoped<IUserService, UserService>();
+
             Service.AddScoped<IResultService, ResultService>(); 
 
             Service.AddIdentity<ApplicationUser, IdentityRole>()

@@ -1,4 +1,5 @@
 ﻿using SurveyBasket.API.Contracts.Authentication;
+using SurveyBasket.API.Contracts.Users;
 
 namespace SurveyBasket.API.Services
 {
@@ -13,6 +14,12 @@ namespace SurveyBasket.API.Services
         Task<Result> ConfirmCode(ConfirmEmailRequest confirmEmailRequest, CancellationToken cancellationToken = default);
 
         Task<Result> ResendConfirmCode(ResendConfirmationEmail resendConfirmationEmail, CancellationToken cancellationToken = default);
+
+        Task<Result> ForgetPassword(ForgetPasswordRequest request);
+
+        Task<Result> ResetPassword(SurveyBasket.API.Authentication.ResetPasswordRequest request);
+
+
 
 
     }

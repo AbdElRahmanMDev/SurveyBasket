@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -7,7 +8,9 @@ using Microsoft.Extensions.Options;
 using SurveyBasket.API.Abstraction;
 using SurveyBasket.API.Authentication;
 using SurveyBasket.API.Contracts.Authentication;
+using SurveyBasket.API.Contracts.Users;
 using SurveyBasket.API.Errors;
+using SurveyBasket.API.Extensions;
 using System.Reflection;
 
 namespace SurveyBasket.API.Controllers
@@ -88,5 +91,31 @@ namespace SurveyBasket.API.Controllers
             return result.IsSuccess ? Ok() : result.ToProblem();
 
         }
+
+       
+
+        [HttpPost("forget-password")]
+        public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordRequest request)
+        {
+            var result = await _authService.ForgetPassword(request);
+
+            if (!result.IsSuccess)
+                return result.ToProblem();
+
+            return Ok();
+        }
+
+
+        [HttpPost("Reset-password")]
+        public async Task<IActionResult>  ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var result = await _authService.ResetPassword(request);
+
+            if (!result.IsSuccess)
+                return result.ToProblem();
+
+            return Ok();
+        }
+
     }
 }

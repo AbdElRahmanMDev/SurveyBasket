@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.API.Abstraction;
 using SurveyBasket.API.Contracts.Authentication;
+using SurveyBasket.API.Contracts.Users;
 using SurveyBasket.API.Entities;
 using SurveyBasket.API.Errors;
 using SurveyBasket.API.Helpers;
@@ -15,6 +16,7 @@ using System.ComponentModel.Design;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace SurveyBasket.API.Services
 {
@@ -155,6 +157,49 @@ namespace SurveyBasket.API.Services
 
 
 
+        public async Task<Result> ForgetPassword(ForgetPasswordRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+                return Result.Succes();
+
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            _logger.LogInformation("Confirmation Code {code}", code);
+
+            await SendResetPasswordEmail(user, code);
+            return Result.Succes();
+
+        }
+
+        public async Task<Result> ResetPassword(SurveyBasket.API.Authentication.ResetPasswordRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if(user is null || !user.EmailConfirmed)
+                return Result.Failure(UserErrors.InvalidCode);
+
+            IdentityResult result;
+
+            try
+            {
+               var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+                result = await _userManager.ResetPasswordAsync(user, request.Code, request.NewPassword);
+
+            }
+            catch (FormatException)
+            {
+                result= IdentityResult.Failed(_userManager.ErrorDescriber.InvalidToken());
+            }
+
+            if (result.Succeeded)
+                return Result.Succes();
+
+            var error = result.Errors.First();
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status401Unauthorized));
+
+
+        }
+
         public async Task<Result> ConfirmCode(ConfirmEmailRequest confirmEmailRequest, CancellationToken cancellationToken = default)
         {
             var user = await _userManager.FindByIdAsync(confirmEmailRequest.UserId);
@@ -215,6 +260,22 @@ namespace SurveyBasket.API.Services
 
              BackgroundJob.Enqueue(()=> _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Email Confirmation", emailBody)) ;
              await Task.CompletedTask;
+
+        }
+
+        private async Task SendResetPasswordEmail(ApplicationUser user,string code)
+        {
+            var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
+            var emailBody = EmailBodyBuilder.GenerateEmailBody("EmailConfirmation",
+               templateModel: new Dictionary<string, string>
+               {
+                { "{{name}}", user.FirstName },
+                    { "{{action_url}}", $"{origin}/auth/forgetPassword?userId={user.Email}&code={code}" }
+               }
+           );
+
+            BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Survey Basket: Change Password", emailBody));
+            await Task.CompletedTask;
 
         }
 
