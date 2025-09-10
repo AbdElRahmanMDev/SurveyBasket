@@ -1,11 +1,13 @@
 ﻿using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.API.Authentication;
+using SurveyBasket.API.Authentication.Filters;
 using SurveyBasket.API.Entities;
 using SurveyBasket.API.Persistence;
 using SurveyBasket.Authentication;
@@ -74,7 +76,7 @@ namespace SurveyBasket.API
 
             Service.AddScoped<IResultService, ResultService>(); 
 
-            Service.AddIdentity<ApplicationUser, IdentityRole>()
+            Service.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders(); // Registers ASP.NET Core Identity services with EF Core store
 
@@ -84,6 +86,11 @@ namespace SurveyBasket.API
             Service.AddExceptionHandler<GlobalException>();
 
             Service.AddScoped<IEmailSender,EmailSender>();
+
+            Service.AddTransient<IAuthorizationHandler, PermissionRequirementHandler>();
+            Service.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
+
+
 
             Service.AddProblemDetails();
 

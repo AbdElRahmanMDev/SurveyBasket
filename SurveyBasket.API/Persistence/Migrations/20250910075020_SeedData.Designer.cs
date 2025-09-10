@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyBasket.API.Persistence;
 
@@ -11,9 +12,11 @@ using SurveyBasket.API.Persistence;
 namespace SurveyBasket.API.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250910075020_SeedData")]
+    partial class SeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,21 +124,21 @@ namespace SurveyBasket.API.Persistence.Migrations
                         {
                             Id = 11,
                             ClaimType = "permissions",
-                            ClaimValue = "roles:read",
+                            ClaimValue = "users:read",
                             RoleId = "CAC716C1-8303-40EE-9E89-B66639503CE5"
                         },
                         new
                         {
                             Id = 12,
                             ClaimType = "permissions",
-                            ClaimValue = "roles:add",
+                            ClaimValue = "users:add",
                             RoleId = "CAC716C1-8303-40EE-9E89-B66639503CE5"
                         },
                         new
                         {
                             Id = 13,
                             ClaimType = "permissions",
-                            ClaimValue = "roles:update",
+                            ClaimValue = "users:update",
                             RoleId = "CAC716C1-8303-40EE-9E89-B66639503CE5"
                         },
                         new
@@ -485,7 +488,7 @@ namespace SurveyBasket.API.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@SURVEY.COM",
                             NormalizedUserName = "ADMIN@SURVEY.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIeFBD4wTkQ7OrmJiAr6NThbTn7I5GxSIcqYYi9TW8n3NNe527mww28g95Dc3acXgA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMWSIFAQf9pi6w6qdEjFLCxPi77vWrg2QmaaAa1kwKuLDTty/W3d61xqwZJwO51sVA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "37CB4836-B3FE-4D99-AF30-45FBEB2E8546",
                             TwoFactorEnabled = false,

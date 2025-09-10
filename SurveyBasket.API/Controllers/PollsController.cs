@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using SurveyBasket.API.Abstraction;
+using SurveyBasket.API.Abstraction.Consts;
+using SurveyBasket.API.Authentication.Filters;
 using SurveyBasket.API.Contracts.Polls;
 
 namespace SurveyBasket.API.Controllers;
@@ -17,9 +19,11 @@ public class PollsController : ControllerBase
         _pollService = pollService;
     }
 
+ 
 
 
     [HttpGet]
+    [HasPermission(Permissions.GetPolls)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var polls=await _pollService.GetAllPollsAsync(cancellationToken);
@@ -27,6 +31,7 @@ public class PollsController : ControllerBase
     }
 
     [HttpGet("GetCurrent")]
+    [Authorize(Roles = DefaultRoles.MemberRoleName)]
     public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
     {
         var polls = await _pollService.GetCurrentAsync(cancellationToken);
