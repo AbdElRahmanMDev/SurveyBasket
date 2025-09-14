@@ -49,6 +49,7 @@ public class PollsController : ControllerBase
     }
 
     [HttpPost("")]
+    [HasPermission(Permissions.AddPolls)]
     public async Task<IActionResult> Add([FromBody] PollRequest pollRequest, CancellationToken cancellationToken)
     {
         var newPoll = await _pollService.AddAsync(pollRequest, cancellationToken);
@@ -57,6 +58,7 @@ public class PollsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [HasPermission(Permissions.UpdatePolls)]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] PollRequest pollmodel, CancellationToken cancellationToken)
     {
 

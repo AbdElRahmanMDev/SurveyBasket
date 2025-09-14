@@ -87,6 +87,8 @@ namespace SurveyBasket.API
 
             Service.AddScoped<IEmailSender,EmailSender>();
 
+           Service.AddScoped<IRoleService,RoleService>();
+
             Service.AddTransient<IAuthorizationHandler, PermissionRequirementHandler>();
             Service.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
