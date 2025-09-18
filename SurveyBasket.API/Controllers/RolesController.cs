@@ -1,6 +1,4 @@
-﻿
-
-using SurveyBasket.API.Abstraction.Consts;
+﻿using SurveyBasket.API.Abstraction.Consts;
 using SurveyBasket.API.Authentication.Filters;
 using SurveyBasket.API.Contracts.Roles;
 
@@ -47,6 +45,30 @@ public class RolesController : ControllerBase
             return result.ToProblem();
 
         return Ok(result.Value);
+    }
+
+
+    [HttpPut("UpdateRole")]
+    public async Task<IActionResult> UpdateRole([FromBody] UpdateRole request, CancellationToken cancellationToken)
+    {
+        var result = await _roleService.UpdateRoleAndPermisson(request, cancellationToken);
+
+        if (!result.IsSuccess)
+            return result.ToProblem();
+
+        return NoContent();
+    }
+
+    [HttpPut("ToggleStatus/{Id}")]
+
+    public async Task<IActionResult> ToggleStatus([FromRoute] string Id, CancellationToken cancellationToken)
+    {
+        var result = await _roleService.ToggleStatus(Id, cancellationToken);
+
+        if (!result.IsSuccess)
+            return result.ToProblem();
+
+        return NoContent();
     }
 
 

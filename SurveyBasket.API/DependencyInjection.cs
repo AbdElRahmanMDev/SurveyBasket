@@ -1,25 +1,22 @@
 ﻿using Hangfire;
-using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.API.Authentication;
 using SurveyBasket.API.Authentication.Filters;
-using SurveyBasket.API.Entities;
+using SurveyBasket.API.Health;
 using SurveyBasket.API.Persistence;
 using SurveyBasket.Authentication;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace SurveyBasket.API
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddService(this IServiceCollection Service, WebApplicationBuilder builder,IConfiguration configuration)
+        public static IServiceCollection AddService(this IServiceCollection Service, WebApplicationBuilder builder, IConfiguration configuration)
         {
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             Service.AddDbContext<ApplicationDbContext>(options =>
@@ -43,7 +40,7 @@ namespace SurveyBasket.API
 
                 });
 
-               
+
             });  //Register Cors
 
 
@@ -74,7 +71,7 @@ namespace SurveyBasket.API
 
             Service.AddScoped<IUserService, UserService>();
 
-            Service.AddScoped<IResultService, ResultService>(); 
+            Service.AddScoped<IResultService, ResultService>();
 
             Service.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -85,9 +82,14 @@ namespace SurveyBasket.API
 
             Service.AddExceptionHandler<GlobalException>();
 
-            Service.AddScoped<IEmailSender,EmailSender>();
+            Service.AddScoped<IEmailSender, EmailSender>();
 
-           Service.AddScoped<IRoleService,RoleService>();
+            Service.AddHealthChecks().
+                AddSqlServer(name: "MyDb", connectionString: configuration.GetConnectionString("DefaultConnection")!)
+                .AddHangfire(options => { options.MinimumAvailableServers = 1; })
+                .AddCheck<MailProviderHealthCheck>(name: "Mail Service");
+
+            Service.AddScoped<IRoleService, RoleService>();
 
             Service.AddTransient<IAuthorizationHandler, PermissionRequirementHandler>();
             Service.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
@@ -144,6 +146,6 @@ namespace SurveyBasket.API
         }
 
 
-        
+
     }
 }

@@ -1,14 +1,8 @@
-
-using FluentValidation;
 using Hangfire;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using SurveyBasket.API;
-using SurveyBasket.API.Entities;
-using SurveyBasket.API.Middlewares;
-using SurveyBasket.API.Persistence;
-using SurveyBasket.API.Services;
-using System.Reflection;
-
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -18,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddService(builder,builder.Configuration);
+builder.Services.AddService(builder, builder.Configuration);
 
 builder.Services.AddDistributedMemoryCache();
 
@@ -26,7 +20,7 @@ builder.Services.AddScoped<ICacheService, CacheService>();
 
 builder.Host.UseSerilog((context, configuration) =>
 {
-    configuration.ReadFrom.Configuration(context.Configuration);    
+    configuration.ReadFrom.Configuration(context.Configuration);
 });
 
 var app = builder.Build();
@@ -48,7 +42,7 @@ var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using var scope = scopeFactory.CreateScope();
 var notificatinService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-RecurringJob.AddOrUpdate("sendNewPollNotification",() => notificatinService.SendNewPollNotification(null), Cron.Daily);
+RecurringJob.AddOrUpdate("sendNewPollNotification", () => notificatinService.SendNewPollNotification(null), Cron.Daily);
 
 app.UseCors("MyPolicy");
 
@@ -59,5 +53,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseExceptionHandler();
+
+app.MapHealthChecks("health", new HealthCheckOptions()
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();

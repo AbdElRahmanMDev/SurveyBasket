@@ -8,6 +8,7 @@ namespace SurveyBasket.API.Entities
 
         public string LastName { get; set; } = string.Empty;
 
+        public bool IsDisabled { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; } = [];
 
     }

@@ -10,6 +10,8 @@ public class GlobalException : IExceptionHandler
     {
         _logger = logger;
     }
+
+
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         _logger.LogError(exception, "Something went Wrong : {Message}", exception.Message);

@@ -10,6 +10,13 @@ namespace SurveyBasket.API.Services
 
         public Task<TResult<RoleDetailResponse>> AddNewRoleWithPermssion(RoleRequest request, CancellationToken cancellationToken = default);
 
+        public Task<Result> UpdateRoleAndPermisson(UpdateRole request, CancellationToken cancellationToken = default);
+
+
+        public Task<Result> ToggleStatus(string RoleId, CancellationToken cancellationToken = default);
+
+
+
 
     }
 }

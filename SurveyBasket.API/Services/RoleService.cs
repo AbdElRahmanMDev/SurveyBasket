@@ -94,73 +94,72 @@ namespace SurveyBasket.API.Services
         }
         public async Task<Result> UpdateRoleAndPermisson(UpdateRole request, CancellationToken cancellationToken = default)
         {
-            var role = await _context.Roles
-              .Where(x => x.Id == request.RoleId)
-              .SingleOrDefaultAsync(cancellationToken);
 
+            var role = await _context.Roles.SingleOrDefaultAsync(x => x.Id == request.RoleId);
             if (role is null)
                 return Result.Failure(RoleErrors.RoleNotFound);
 
-
-            var Allpermissons = Permissions.GetAllPermissons();
-
-
-            if (request.Permissions.Except(Allpermissons).Any())
-                return Result.Failure<RoleDetailResponse>(RoleErrors.InvalidPermission);
+            var allPermissionsInSystem = Permissions.GetAllPermissons();
+            var IsPermissionExist = request.Permissions;
+            if (IsPermissionExist.Except(allPermissionsInSystem).Any())
+                return Result.Failure(RoleErrors.InvalidPermission);
 
             role.Name = request.Name;
 
-            var roleClaims = await _context.RoleClaims.Where(x => x.RoleId == request.RoleId).ToListAsync(cancellationToken);
-
-            var deletedroleClaims = roleClaims
-                .Where(x => request.Permissions.Contains(x.ClaimValue!) == false)
-                .ToList();
-            _context.RoleClaims.RemoveRange(deletedroleClaims);
-            await _context.SaveChangesAsync(cancellationToken);
-
-
-
-            var result = await _roleManager.UpdateAsync(role);
-            //Different Scenarios In Update 
-            //New Data that isn't In Db in that case you need to delete data in Db
-            //Data 
-
+            var result = await _roleManager.SetRoleNameAsync(role, request.Name);
 
             if (result.Succeeded)
             {
-                var existingClaims = await _context.RoleClaims
-                    .Where(x => x.RoleId == role.Id)
-                    .Select(x => x.ClaimValue!)
-                    .ToListAsync(cancellationToken);
+                var currentPermissions = await _context.RoleClaims.Where(x => x.RoleId == request.RoleId)
+               .Select(x => x.ClaimValue!)
+               .ToListAsync(cancellationToken);
 
-                //Existing permission In Db
-                //newData that doesn't exist In Db
-                var newPermissionData = request.Permissions.Except(existingClaims).ToList();
+                var requestPermissions = request.Permissions;
+
+                var newAddedPermissions = request.Permissions.Except(currentPermissions);
+
+                var removedPermissions = currentPermissions.Except(requestPermissions);
+
+                if (newAddedPermissions.Any())
+                {
+                    var newPermissons = newAddedPermissions.
+                        Select(x => new IdentityRoleClaim<string>()
+                        {
+                            ClaimType = Permissions.Type,
+                            ClaimValue = x,
+                            RoleId = request.RoleId
+                        });
+                    await _context.RoleClaims.AddRangeAsync(newPermissons);
+                }
 
 
-                var permissons = newPermissionData.
-                    Select(x => new IdentityRoleClaim<string>()
-                    {
-                        ClaimType = Permissions.Type,
-                        ClaimValue = x,
-                        RoleId = role.Id
-                    });
+                await _context.RoleClaims.Where(x => removedPermissions.Contains(x.ClaimValue)).ExecuteDeleteAsync(cancellationToken);
 
-                await _context.RoleClaims.AddRangeAsync(permissons);
                 await _context.SaveChangesAsync();
 
-                var response = new RoleDetailResponse(role.Id, role.Name, role.IsDeleted, request.Permissions);
-                return Result.Succes(response);
+                return Result.Succes("Role Update Successfully");
             }
 
-            var error = result.Errors.First();
+            var error = result.Errors.FirstOrDefault();
 
-            return Result.Failure<RoleDetailResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
-
-
-
+            return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status404NotFound));
         }
 
 
+
+
+        public async Task<Result> ToggleStatus(string RoleId, CancellationToken cancellationToken = default)
+        {
+            var role = await _context.Roles.SingleOrDefaultAsync(x => x.Id == RoleId);
+            if (role is null)
+                return Result.Failure(RoleErrors.RoleNotFound);
+
+            role.IsDeleted = !role.IsDeleted;
+
+            await _roleManager.UpdateAsync(role);
+
+            return Result.Succes();
+
+        }
     }
 }
