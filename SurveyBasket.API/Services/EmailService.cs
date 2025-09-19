@@ -1,6 +1,5 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -34,6 +33,9 @@ namespace SurveyBasket.API.Services
 
             message.Body = builder.ToMessageBody();
 
+
+
+
             using var smtp = new SmtpClient();
 
             _logger.LogInformation("Sending email to {email}", email);
@@ -44,5 +46,8 @@ namespace SurveyBasket.API.Services
             smtp.Disconnect(true);
 
         }
+
+
+
     }
 }

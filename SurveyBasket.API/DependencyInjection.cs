@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.API.Authentication;
 using SurveyBasket.API.Authentication.Filters;
+using SurveyBasket.API.Extensions;
 using SurveyBasket.API.Health;
 using SurveyBasket.API.Persistence;
 using SurveyBasket.Authentication;
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace SurveyBasket.API
 {
@@ -94,6 +96,78 @@ namespace SurveyBasket.API
             Service.AddTransient<IAuthorizationHandler, PermissionRequirementHandler>();
             Service.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
+            Service.AddRateLimiter(rateLimiterOptions =>
+            {
+                rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+
+                rateLimiterOptions.AddPolicy<string>("ipLimit", httpContext =>
+                {
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 2,
+                            Window = TimeSpan.FromSeconds(20)
+                        }
+                    );
+                });
+
+
+                rateLimiterOptions.AddPolicy<string>("userLimit", httpContext =>
+                {
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.User.GetUserId() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 2,
+                            Window = TimeSpan.FromSeconds(20)
+                        }
+                    );
+                });
+
+
+                //rateLimiterOptions.AddConcurrencyLimiter("Concurrency", options =>
+                //{
+                //    options.PermitLimit = 2;
+                //    options.QueueLimit =1;
+                //    options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+
+                //});
+
+
+                //rateLimiterOptions.AddTokenBucketLimiter("token", options =>
+                //{
+                //    options.TokenLimit = 2;
+                //    options.QueueLimit = 1;
+                //    options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+                //    options.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+                //    options.AutoReplenishment = true;
+
+                //});
+
+                //rateLimiterOptions.AddFixedWindowLimiter("fixed", options =>
+                //{
+                //    options.PermitLimit = 2;
+                //    options.Window = TimeSpan.FromSeconds(20);
+                //    options.QueueLimit = 1;
+                //    options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+
+
+                //});
+
+                //rateLimiterOptions.AddSlidingWindowLimiter("sliding", options =>
+                //{
+                //    options.PermitLimit = 2;
+                //    options.Window = TimeSpan.FromSeconds(20);
+                //    options.SegmentsPerWindow = 2;
+                //    options.QueueLimit = 1;
+                //    options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+
+
+                //});
+
+            });
 
 
             Service.AddProblemDetails();
