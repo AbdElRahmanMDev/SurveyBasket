@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Asp.Versioning;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -96,6 +97,14 @@ namespace SurveyBasket.API
             Service.AddTransient<IAuthorizationHandler, PermissionRequirementHandler>();
             Service.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
+            Service.AddApiVersioning(option =>
+            {
+                option.ApiVersionReader = new UrlSegmentApiVersionReader();
+            }).AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+            });
             Service.AddRateLimiter(rateLimiterOptions =>
             {
                 rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
